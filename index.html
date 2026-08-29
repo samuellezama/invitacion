@@ -679,8 +679,8 @@
   }, { threshold: 0.15 });
   revealEls.forEach(el=> io.observe(el));
 
-  // Countdown to Feb 21, 2027, 13:00 (event start)
-  const eventDate = new Date('2026-09-25T13:00:00');
+  // Countdown to September 26, 2026, 13:00 (event start)
+  const eventDate = new Date('2026-09-26T13:00:00');
   function tick(){
     const now = new Date();
     let diff = eventDate - now;
@@ -717,22 +717,41 @@
     if(guestCount > 0){ guestCount--; guestSpan.textContent = guestCount; }
   });
 
-  // Form submit -> success state (front-end only demo)
+  // Form submit -> Redirigir a WhatsApp
   const form = document.getElementById('rsvpForm');
-  const success = document.getElementById('rsvpSuccess');
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const name = document.getElementById('name').value.trim() || 'Invitado';
+    
+    // Obtener los valores del formulario
+    const name = document.getElementById('name').value.trim();
     const attend = document.querySelector('input[name="attend"]:checked').value;
-    const title = document.getElementById('successTitle');
-    const msg = document.getElementById('successMsg');
+    const msg = document.getElementById('msg').value.trim();
+    
+    // Tu número de WhatsApp (incluye código de país, por ejemplo 52 para México y tu número a 10 dígitos)
+    const tuNumeroWhatsApp = "522290000000"; // <--- CAMBIA ESTE NÚMERO POR EL TUYO
+    
+    let textoMensaje = "";
     if(attend === 'si'){
-      title.textContent = '¡Nos vemos ahí, ' + name.split(' ')[0] + '!';
-      msg.textContent = 'Tu confirmación con ' + guestCount + ' acompañante(s) fue registrada. ¡Gracias por ser parte de este día!';
+      textoMensaje = `¡Hola! Confirmo mi asistencia a los XV Años de Zulem Ariadne.\n\n*Nombre:* ${name}\n*Asistencia:* Sí ahí estaré ✅\n*Acompañantes:* ${guestCount}`;
+      if(msg) textoMensaje += `\n*Mensaje:* ${msg}`;
     } else {
-      title.textContent = 'Gracias, ' + name.split(' ')[0];
-      msg.textContent = 'Lamentamos que no puedas acompañarnos, pero agradecemos que nos avisaras. ¡Con cariño te recordaremos ese día!';
+      textoMensaje = `¡Hola! Lamento mucho informar que no podré asistir a los XV Años de Zulem Ariadne.\n\n*Nombre:* ${name}\n*Asistencia:* No podré ir ❌`;
+      if(msg) textoMensaje += `\n*Mensaje:* ${msg}`;
     }
+
+    // Codificar el texto para la URL
+    const urlEncoded = encodeURIComponent(textoMensaje);
+    
+    // Abrir WhatsApp con el mensaje prellenado
+    window.open(`https://wa.me/${tuNumeroWhatsApp}?text=${urlEncoded}`, '_blank');
+    
+    // Opcional: Mostrar la pantalla de éxito local
+    const success = document.getElementById('rsvpSuccess');
+    const title = document.getElementById('successTitle');
+    const successMsg = document.getElementById('successMsg');
+    
+    title.textContent = '¡Gracias, ' + name.split(' ')[0] + '!';
+    successMsg.textContent = 'Se abrirá WhatsApp para enviar tu confirmación.';
     form.classList.add('hide');
     success.classList.add('show');
   });
