@@ -626,7 +626,7 @@
           </div>
 
           <div class="field">
-            <label for="msg">Mensaje para Zulem (opcional)</label>
+            <label for="msg">Mensaje para Zulem Ariadne (opcional)</label>
             <textarea id="msg" placeholder="Escribe unas palabras..."></textarea>
           </div>
 
@@ -731,10 +731,10 @@
     
     let textoMensaje = "";
     if(attend === 'si'){
-      textoMensaje = `Confirmo asistencia XV Zulem. Nombre: ${name}. Si ire. Acompanantes: ${guestCount}.`;
+      textoMensaje = `Confirmo asistencia los XV años de Zulem. Nombre: ${name}. Si ire. Acompanantes: ${guestCount}.`;
       if(msg) textoMensaje += ` Msg: ${msg}`;
     } else {
-      textoMensaje = `No podre asistir a XV Zulem. Nombre: ${name}.`;
+      textoMensaje = `No podre asistir a los XV años de Zulem. Nombre: ${name}.`;
       if(msg) textoMensaje += ` Msg: ${msg}`;
     }
 
@@ -750,7 +750,7 @@
     const successMsg = document.getElementById('successMsg');
     
     title.textContent = '¡Gracias, ' + name.split(' ')[0] + '!';
-    successMsg.textContent = 'Se abrirá tu aplicación de mensajes para enviar la confirmación.';
+    successMsg.textContent = 'Se abrirá tu aplicación de mensajes para enviar la confirmación a Athalia Judith.';
     form.classList.add('hide');
     success.classList.add('show');
   });
