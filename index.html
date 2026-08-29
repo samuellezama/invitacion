@@ -671,6 +671,24 @@
 
 </div>
 
+<!-- Reproductor de música flotante -->
+<div id="musicPlayer" style="position: fixed; bottom: 20px; right: 20px; z-index: 999; background: rgba(255, 255, 255, 0.9); padding: 10px 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; backdrop-filter: blur(5px); cursor: pointer; border: 1px solid rgba(0,0,0,0.1);">
+  <span id="musicIcon" style="font-size: 20px; display: inline-block;">🎻</span>
+  <span id="musicText" style="font-size: 13px; font-weight: 500; color: #333; font-family: sans-serif;">Música de violín</span>
+  <!-- Archivo de violín optimizado para web -->
+  <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=violin-emotional-110482.mp3" loop></audio>
+</div>
+
+<style>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .playing {
+    animation: spin 4s linear infinite;
+  }
+</style>
+
 <script>
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
@@ -717,6 +735,30 @@
     if(guestCount > 0){ guestCount--; guestSpan.textContent = guestCount; }
   });
 
+  // Control de Música de Violín
+  const musicPlayer = document.getElementById('musicPlayer');
+  const bgMusic = document.getElementById('bgMusic');
+  const musicText = document.getElementById('musicText');
+  const musicIcon = document.getElementById('musicIcon');
+  let isPlaying = false;
+
+  musicPlayer.addEventListener('click', () => {
+    if (isPlaying) {
+      bgMusic.pause();
+      musicText.textContent = 'Música de violín';
+      musicIcon.classList.remove('playing');
+      isPlaying = false;
+    } else {
+      bgMusic.play().then(() => {
+        musicText.textContent = 'Pausar música';
+        musicIcon.classList.add('playing');
+        isPlaying = true;
+      }).catch(error => {
+        console.log("Error al reproducir audio: ", error);
+      });
+    }
+  });
+
   // Form submit -> Generar enlaces de WhatsApp, SMS y Correo
   const form = document.getElementById('rsvpForm');
   form.addEventListener('submit', (e)=>{
@@ -726,10 +768,9 @@
     const attend = document.querySelector('input[name="attend"]:checked').value;
     const msg = document.getElementById('msg').value.trim();
     
-    const tuNumero = "2294054960"; // Tu número a 10 dígitos (con código de país 52 para México)
-    const tuCorreo = "samuellezama@gmail.com"; // Tu correo electrónico configurado
+    const tuNumero = "2294054960";
+    const tuCorreo = "samuellezama@gmail.com";
     
-    // 1. Texto para WhatsApp y SMS
     let textoMensaje = "";
     if(attend === 'si'){
       textoMensaje = `¡Hola! Confirmo mi asistencia a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: Sí iré ✅\n• Acompañantes: ${guestCount}`;
@@ -740,7 +781,6 @@
     }
     const textoEncoded = encodeURIComponent(textoMensaje);
 
-    // 2. Formato para Correo Electrónico
     const asuntoCorreo = `Confirmación XV Zulem - ${name}`;
     let cuerpoCorreo = `Hola, te comparto los detalles de mi confirmación para los XV Años de Zulem Ariadne:\n\n`;
     cuerpoCorreo += `• Nombre del invitado: ${name}\n`;
@@ -758,12 +798,10 @@
     const asuntoEncoded = encodeURIComponent(asuntoCorreo);
     const cuerpoEncoded = encodeURIComponent(cuerpoCorreo);
 
-    // URLs finales
     const urlWhatsApp = `https://wa.me/52${tuNumero}?text=${textoEncoded}`;
     const urlSms = `sms:${tuNumero}?body=${textoEncoded}`;
     const urlMail = `mailto:${tuCorreo}?subject=${asuntoEncoded}&body=${cuerpoEncoded}`;
 
-    // Mostrar pantalla de selección de opciones de envío
     const success = document.getElementById('rsvpSuccess');
     
     success.innerHTML = `
