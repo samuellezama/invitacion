@@ -717,7 +717,7 @@
     if(guestCount > 0){ guestCount--; guestSpan.textContent = guestCount; }
   });
 
-  // Form submit -> Enviar por SMS tradicional
+  // Form submit -> Enviar por SMS y Correo Electrónico Limpio de forma automática
   const form = document.getElementById('rsvpForm');
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
@@ -726,31 +726,60 @@
     const attend = document.querySelector('input[name="attend"]:checked').value;
     const msg = document.getElementById('msg').value.trim();
     
-    // Tu número celular a 10 dígitos (para mensajes de texto SMS normales)
-    const tuNumeroCelular = "2294054960"; // <--- CAMBIA ESTE NÚMERO POR EL TUYO
-    
-    let textoMensaje = "";
+    // 1. Configuración para Mensaje de Texto (SMS)
+    const tuNumeroCelular = "2294054960";
+    let textoSms = "";
     if(attend === 'si'){
-      textoMensaje = `Confirmo asistencia los XV años de Zulem. Nombre: ${name}. Si ire. Acompanantes: ${guestCount}.`;
-      if(msg) textoMensaje += ` Msg: ${msg}`;
+      textoSms = `Confirmo asistencia los XV años de Zulem. Nombre: ${name}. Si iré. Acompañantes: ${guestCount}.`;
+      if(msg) textoSms += ` Msg: ${msg}`;
     } else {
-      textoMensaje = `No podre asistir a los XV años de Zulem. Nombre: ${name}.`;
-      if(msg) textoMensaje += ` Msg: ${msg}`;
+      textoSms = `No podré asistir a los XV años de Zulem. Nombre: ${name}.`;
+      if(msg) textoSms += ` Msg: ${msg}`;
     }
+    const smsEncoded = encodeURIComponent(textoSms);
 
-    // Codificar el texto para la URL de SMS
-    const urlEncoded = encodeURIComponent(textoMensaje);
+    // 2. Configuración para Correo Electrónico Limpio
+    const tuCorreo = "samuellezama@gmail.com"; // <--- REEMPLAZA CON TU CORREO REAL
+    const asuntoCorreo = `Confirmación XV Zulem - ${name}`;
     
-    // Abrir la aplicación de mensajes SMS del celular
-    window.location.href = `sms:${tuNumeroCelular}?body=${urlEncoded}`;
+    let cuerpoCorreo = `Hola, te comparto los detalles de mi confirmación para los XV Años de Zulem Ariadne:\n\n`;
+    cuerpoCorreo += `• Nombre del invitado: ${name}\n`;
     
-    // Mostrar pantalla de éxito local
+    if(attend === 'si'){
+      cuerpoCorreo += `• Asistencia: Sí asistirá ✅\n`;
+      cuerpoCorreo += `• Número de acompañantes: ${guestCount}\n`;
+    } else {
+      cuerpoCorreo += `• Asistencia: No podrá asistir ❌\n`;
+    }
+    
+    if(msg){
+      cuerpoCorreo += `• Mensaje o felicitación: "${msg}"\n`;
+    }
+    
+    cuerpoCorreo += `\n(Enviado desde la invitación web de XV Zulem)`;
+
+    const asuntoEncoded = encodeURIComponent(asuntoCorreo);
+    const cuerpoEncoded = encodeURIComponent(cuerpoCorreo);
+
+    // Disparar la aplicación de mensajes SMS
+    window.location.href = `sms:${tuNumeroCelular}?body=${smsEncoded}`;
+
+    // Disparar el cliente de correo limpio con un leve retraso para que el navegador procese ambos
+    setTimeout(() => {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `mailto:${tuCorreo}?subject=${asuntoEncoded}&body=${cuerpoEncoded}`;
+      document.body.appendChild(iframe);
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 500);
+
+    // Mostrar pantalla de éxito local en la web
     const success = document.getElementById('rsvpSuccess');
     const title = document.getElementById('successTitle');
     const successMsg = document.getElementById('successMsg');
     
     title.textContent = '¡Gracias, ' + name.split(' ')[0] + '!';
-    successMsg.textContent = 'Se abrirá tu aplicación de mensajes para enviar la confirmación a Athalia Judith.';
+    successMsg.textContent = 'Se han preparado tus aplicaciones de mensajes y correo para enviar la confirmación.';
     form.classList.add('hide');
     success.classList.add('show');
   });
