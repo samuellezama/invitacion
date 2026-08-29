@@ -717,7 +717,7 @@
     if(guestCount > 0){ guestCount--; guestSpan.textContent = guestCount; }
   });
 
-  // Form submit -> Enviar por SMS de forma segura y sin bloqueos
+  // Form submit -> Generar enlaces de WhatsApp, SMS y Correo
   const form = document.getElementById('rsvpForm');
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
@@ -726,35 +726,68 @@
     const attend = document.querySelector('input[name="attend"]:checked').value;
     const msg = document.getElementById('msg').value.trim();
     
-    // Tu número celular a 10 dígitos
-    const tuNumeroCelular = "2294054960";
+    const tuNumero = "2294054960"; // Tu número a 10 dígitos (con código de país 52 para México)
+    const tuCorreo = "samuellezama@gmail.com"; // Tu correo electrónico configurado
     
-    let textoSms = "";
+    // 1. Texto para WhatsApp y SMS
+    let textoMensaje = "";
     if(attend === 'si'){
-      textoSms = `Confirmo asistencia los XV años de Zulem. Nombre: ${name}. Sí iré. Acompañantes: ${guestCount}.`;
-      if(msg) textoSms += ` Msg: ${msg}`;
+      textoMensaje = `¡Hola! Confirmo mi asistencia a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: Sí iré ✅\n• Acompañantes: ${guestCount}`;
+      if(msg) textoMensaje += `\n• Mensaje: "${msg}"`;
     } else {
-      textoSms = `No podré asistir a los XV años de Zulem. Nombre: ${name}.`;
-      if(msg) textoSms += ` Msg: ${msg}`;
+      textoMensaje = `Hola, lamento informar que no podré asistir a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: No podré asistir ❌`;
+      if(msg) textoMensaje += `\n• Mensaje: "${msg}"`;
     }
+    const textoEncoded = encodeURIComponent(textoMensaje);
 
-    // Codificar el texto para la URL de SMS
-    const urlEncoded = encodeURIComponent(textoSms);
-    
-    // Abrir la aplicación de mensajes SMS de forma limpia con el gesto del usuario
-    window.location.href = `sms:${tuNumeroCelular}?body=${urlEncoded}`;
-    
-    // Mostrar pantalla de éxito local
+    // 2. Formato para Correo Electrónico
+    const asuntoCorreo = `Confirmación XV Zulem - ${name}`;
+    let cuerpoCorreo = `Hola, te comparto los detalles de mi confirmación para los XV Años de Zulem Ariadne:\n\n`;
+    cuerpoCorreo += `• Nombre del invitado: ${name}\n`;
+    if(attend === 'si'){
+      cuerpoCorreo += `• Asistencia: Sí asistirá ✅\n`;
+      cuerpoCorreo += `• Número de acompañantes: ${guestCount}\n`;
+    } else {
+      cuerpoCorreo += `• Asistencia: No podrá asistir ❌\n`;
+    }
+    if(msg){
+      cuerpoCorreo += `• Mensaje o felicitación: "${msg}"\n`;
+    }
+    cuerpoCorreo += `\n(Enviado desde la invitación web de XV Zulem)`;
+
+    const asuntoEncoded = encodeURIComponent(asuntoCorreo);
+    const cuerpoEncoded = encodeURIComponent(cuerpoCorreo);
+
+    // URLs finales
+    const urlWhatsApp = `https://wa.me/52${tuNumero}?text=${textoEncoded}`;
+    const urlSms = `sms:${tuNumero}?body=${textoEncoded}`;
+    const urlMail = `mailto:${tuCorreo}?subject=${asuntoEncoded}&body=${cuerpoEncoded}`;
+
+    // Mostrar pantalla de selección de opciones de envío
     const success = document.getElementById('rsvpSuccess');
-    const title = document.getElementById('successTitle');
-    const successMsg = document.getElementById('successMsg');
     
-    title.textContent = '¡Gracias, ' + name.split(' ')[0] + '!';
-    successMsg.textContent = 'Se abrirá tu aplicación de mensajes para enviar la confirmación a Athalia Judith.';
+    success.innerHTML = `
+      <div style="text-align: center; padding: 10px 0;">
+        <h3 style="margin-bottom: 10px;">¡Gracias, ${name.split(' ')[0]}!</h3>
+        <p style="margin-bottom: 20px;">Elige cómo prefieres enviar tu confirmación:</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 280px; margin: 0 auto;">
+          <a href="${urlWhatsApp}" target="_blank" style="background-color: #25D366; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(37,211,102,0.3);">
+            💬 Enviar por WhatsApp
+          </a>
+          <a href="${urlSms}" style="background-color: #007AFF; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,122,255,0.3);">
+            ✉️ Enviar por SMS
+          </a>
+          <a href="${urlMail}" style="background-color: #EA4335; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(234,67,53,0.3);">
+            📥 Enviar por Correo
+          </a>
+        </div>
+      </div>
+    `;
+
     form.classList.add('hide');
     success.classList.add('show');
   });
 </script>
-
 </body>
 </html>
