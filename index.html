@@ -790,7 +790,7 @@
     
     let textoMensaje = "";
     if(attend === 'si'){
-      textoMensaje = `¡Hola! Confirmo mi asistencia a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: Sí iré ✅\n• Acompañantes: ${guestCount}`;
+      textoMensaje = `¡Hola! Confirmo mi asistencia a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: Sí iré ✅\n• Acompañantes: ${guestCount} además de mi`;
       if(msg) textoMensaje += `\n• Mensaje: "${msg}"`;
     } else {
       textoMensaje = `Hola, lamento informar que no podré asistir a los XV años de Zulem.\n\n• Nombre: ${name}\n• Asistencia: No podré asistir ❌`;
@@ -803,7 +803,7 @@
     cuerpoCorreo += `• Nombre del invitado: ${name}\n`;
     if(attend === 'si'){
       cuerpoCorreo += `• Asistencia: Sí asistirá ✅\n`;
-      cuerpoCorreo += `• Número de acompañantes: ${guestCount}\n`;
+      cuerpoCorreo += `• Número de acompañantes: ${guestCount} además de mi\n`;
     } else {
       cuerpoCorreo += `• Asistencia: No podrá asistir ❌\n`;
     }
